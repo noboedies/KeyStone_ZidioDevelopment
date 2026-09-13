@@ -6,6 +6,7 @@ import com.tausif.entity.Customer;
 import com.tausif.repository.CustomerRepo;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,9 @@ public class CustomerService {
 
     @Autowired
     private CustomerRepo customerRepo;
+
+
+    private final BCryptPasswordEncoder bCrypt = new BCryptPasswordEncoder();
 
     public boolean register(CustomerRegDto customerRegDto) {
         Customer customer = customerRepo.findByEmail(customerRegDto.getEmail());
@@ -31,11 +35,12 @@ public class CustomerService {
     }
 
     private Customer mapToEntity(CustomerRegDto customerRegDto) {
+
         Customer customer = new Customer();
         customer.setEmail(customerRegDto.getEmail());
         customer.setUsername(customerRegDto.getUsername());
         customer.setName(customerRegDto.getName());
-        customer.setPassword(customerRegDto.getPassword());
+        customer.setPassword(bCrypt.encode(customerRegDto.getPassword()));
         customer.setPhone(customerRegDto.getPhone());
         customer.setCreatedAt(LocalDateTime.now());
         return customer;
